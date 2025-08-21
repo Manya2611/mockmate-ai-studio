@@ -38,8 +38,18 @@ const InterviewPage = () => {
   useEffect(() => {
     const storedData = localStorage.getItem("userFormData");
     if (storedData) {
-      const data = JSON.parse(storedData) as UserData;
-      setUserData(data);
+      const raw = JSON.parse(storedData) as any;
+      const normalized: UserData = {
+        fullName: raw.fullName ?? "",
+        email: raw.email ?? "",
+        year: raw.year ?? "",
+        domains: Array.isArray(raw.domains)
+          ? raw.domains
+          : (raw.domain ? [raw.domain] : []),
+        position: raw.position ?? "",
+        company: raw.company ?? "",
+      };
+      setUserData(normalized);
       
       // Data loaded successfully
     } else {
@@ -157,7 +167,7 @@ const InterviewPage = () => {
                 Company: {userData.company} • Level: {userData.year}
               </p>
               <p className="text-sm text-muted-foreground">
-                Domains: {userData.domains.join(", ")}
+                Domains: {Array.isArray(userData.domains) && userData.domains.length > 0 ? userData.domains.join(", ") : "Not specified"}
               </p>
             </div>
 
