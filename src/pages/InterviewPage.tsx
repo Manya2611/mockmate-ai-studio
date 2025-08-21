@@ -21,8 +21,9 @@ interface UserData {
   fullName: string;
   email: string;
   year: string;
-  domain: string;
+  domains: string[];
   position: string;
+  company: string;
 }
 
 const InterviewPage = () => {
@@ -40,14 +41,7 @@ const InterviewPage = () => {
       const data = JSON.parse(storedData) as UserData;
       setUserData(data);
       
-      // Initialize with welcome message
-      const welcomeMessage: Message = {
-        id: "welcome",
-        type: "ai",
-        content: `Welcome, ${data.fullName}! I'm excited to conduct your mock interview for the ${data.position} position. I'll be asking you questions related to ${data.domain} based on your ${data.year} level experience. Let's start with: Tell me about yourself and why you're interested in this position.`,
-        timestamp: new Date(),
-      };
-      setMessages([welcomeMessage]);
+      // Data loaded successfully
     } else {
       // Redirect to signup if no data
       navigate("/signup");
@@ -99,23 +93,12 @@ const InterviewPage = () => {
   };
 
   const handleSubmitInterview = async () => {
-    if (messages.length < 3) {
-      toast({
-        title: "Interview Too Short",
-        description: "Please continue the interview for more comprehensive feedback.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
 
     // Prepare data for n8n webhook
     const interviewData = {
       userData,
-      messages,
       completedAt: new Date().toISOString(),
-      conversationLength: messages.length,
     };
 
     try {
@@ -166,137 +149,36 @@ const InterviewPage = () => {
             transition={{ duration: 0.6 }}
             className="max-w-4xl mx-auto h-full flex flex-col"
           >
-            <div className="text-center mb-6">
+            <div className="text-center mb-8">
               <h1 className="text-3xl font-heading font-bold mb-2">
                 Mock Interview for <span className="hero-text">{userData.position}</span>
               </h1>
-              <p className="text-muted-foreground">
-                Domain: {userData.domain} • Level: {userData.year}
+              <p className="text-muted-foreground mb-2">
+                Company: {userData.company} • Level: {userData.year}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Domains: {userData.domains.join(", ")}
               </p>
             </div>
 
-            {/* Chat Area */}
-            <div className="flex-1 bg-card/20 backdrop-blur-sm border border-border/30 rounded-3xl p-6 flex flex-col">
-              <ScrollArea className="flex-1 pr-4">
-                <div className="space-y-6">
-                  {messages.map((message) => (
-                    <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4 }}
-                      className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
-                    >
-                      <div
-                        className={`
-                          max-w-[80%] flex items-start gap-3
-                          ${message.type === "user" ? "flex-row-reverse" : "flex-row"}
-                        `}
-                      >
-                        <Avatar className="w-10 h-10 border-2 border-border/50">
-                          {message.type === "ai" ? (
-                            <>
-                              <AvatarFallback className="bg-primary text-primary-foreground">
-                                <Bot className="w-5 h-5" />
-                              </AvatarFallback>
-                            </>
-                          ) : (
-                            <>
-                              <AvatarFallback className="bg-accent text-accent-foreground">
-                                {userData.fullName.charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </>
-                          )}
-                        </Avatar>
-
-                        <div
-                          className={`
-                            p-4 rounded-2xl max-w-md
-                            ${message.type === "ai" 
-                              ? "chat-ai" 
-                              : "chat-user"
-                            }
-                          `}
-                        >
-                          <p className="text-sm leading-relaxed">{message.content}</p>
-                          <span className="text-xs opacity-70 mt-2 block">
-                            {message.timestamp.toLocaleTimeString([], { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-
-                  {isLoading && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex justify-start"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar className="w-10 h-10 border-2 border-border/50">
-                          <AvatarFallback className="bg-primary text-primary-foreground">
-                            <Bot className="w-5 h-5" />
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="chat-ai p-4 rounded-2xl">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
+            {/* Interview Area - Ready for ElevenLabs Integration */}
+            <div className="flex-1 bg-card/20 backdrop-blur-sm border border-border/30 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[500px]">
+              <div className="text-center space-y-6 max-w-md">
+                <div className="w-24 h-24 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                  <Bot className="w-12 h-12 text-primary" />
                 </div>
-              </ScrollArea>
-
-              {/* Input Area */}
-              <div className="mt-6 space-y-4">
-                <div className="flex gap-3">
-                  <div className="flex-1">
-                    <Input
-                      value={currentMessage}
-                      onChange={(e) => setCurrentMessage(e.target.value)}
-                      placeholder="Type your answer here..."
-                      className="bg-input/50 border-border/50 focus:border-primary focus:shadow-ai-glow transition-all duration-300"
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <Button
-                    onClick={toggleListening}
-                    variant="outline"
-                    size="icon"
-                    className={`
-                      transition-all duration-300
-                      ${isListening 
-                        ? "bg-destructive text-destructive-foreground shadow-ai-glow" 
-                        : "bg-card/50 hover:bg-primary hover:text-primary-foreground"
-                      }
-                    `}
-                  >
-                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                  </Button>
-                  <Button
-                    onClick={handleSendMessage}
-                    disabled={!currentMessage.trim() || isLoading}
-                    className="bg-primary hover:bg-primary/90 shadow-ai-glow"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
+                
+                <div>
+                  <h2 className="text-2xl font-heading font-semibold mb-3">
+                    AI Interview Assistant Ready
+                  </h2>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Your personalized interview experience is being prepared based on your profile. 
+                    The AI assistant will be integrated here soon.
+                  </p>
                 </div>
 
-                <div className="flex justify-center">
+                <div className="pt-4">
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       onClick={handleSubmitInterview}
@@ -305,7 +187,7 @@ const InterviewPage = () => {
                       className="bg-ai-gradient hover:shadow-ai-glow-strong px-8 py-6 rounded-full font-semibold transition-all duration-300"
                     >
                       <FileText className="w-5 h-5 mr-2" />
-                      {isLoading ? "Analyzing..." : "Submit & Get Feedback"}
+                      {isLoading ? "Processing..." : "Complete Interview & Get Feedback"}
                     </Button>
                   </motion.div>
                 </div>

@@ -14,8 +14,9 @@ interface FormData {
   fullName: string;
   email: string;
   year: string;
-  domain: string;
+  domains: string[];
   position: string;
+  company: string;
 }
 
 const SignupPage = () => {
@@ -26,14 +27,15 @@ const SignupPage = () => {
     fullName: "",
     email: "",
     year: "",
-    domain: "",
+    domains: [],
     position: "",
+    company: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.fullName || !formData.email || !formData.year || !formData.domain || !formData.position) {
+    if (!formData.fullName || !formData.email || !formData.year || formData.domains.length === 0 || !formData.position || !formData.company) {
       toast({
         title: "Missing Information",
         description: "Please fill in all fields to continue.",
@@ -56,6 +58,15 @@ const SignupPage = () => {
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const toggleDomain = (domain: string) => {
+    setFormData(prev => ({
+      ...prev,
+      domains: prev.domains.includes(domain)
+        ? prev.domains.filter(d => d !== domain)
+        : [...prev.domains, domain]
+    }));
   };
 
   return (
@@ -153,33 +164,49 @@ const SignupPage = () => {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="domain" className="text-base font-medium flex items-center gap-2">
+                <div className="space-y-4">
+                  <Label className="text-base font-medium flex items-center gap-2">
                     <Laptop className="h-4 w-4 text-primary" />
-                    Domain/Subject
+                    Technical Domains/Subjects (Select Multiple)
                   </Label>
-                  <Select value={formData.domain} onValueChange={(value) => handleInputChange("domain", value)}>
-                    <SelectTrigger className="bg-input/50 border-border/50 focus:border-primary focus:shadow-ai-glow transition-all duration-300">
-                      <SelectValue placeholder="Select your domain" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="java">Java</SelectItem>
-                      <SelectItem value="python">Python</SelectItem>
-                      <SelectItem value="dsa">Data Structures & Algorithms</SelectItem>
-                      <SelectItem value="os">Operating Systems</SelectItem>
-                      <SelectItem value="dbms">Database Management</SelectItem>
-                      <SelectItem value="aiml">AI/ML</SelectItem>
-                      <SelectItem value="web">Web Development</SelectItem>
-                      <SelectItem value="mobile">Mobile Development</SelectItem>
-                      <SelectItem value="devops">DevOps</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {[
+                      "Java", "Python", "JavaScript", "C++", "Go", "Rust",
+                      "Data Structures & Algorithms", "System Design", "Operating Systems",
+                      "Database Management", "Computer Networks", "Distributed Systems",
+                      "AI/Machine Learning", "Deep Learning", "Computer Vision",
+                      "Web Development", "Frontend Development", "Backend Development",
+                      "Mobile Development", "Android", "iOS", "React Native",
+                      "DevOps", "Cloud Computing", "AWS", "Docker", "Kubernetes",
+                      "Cybersecurity", "Blockchain", "Game Development"
+                    ].map((domain) => (
+                      <button
+                        key={domain}
+                        type="button"
+                        onClick={() => toggleDomain(domain)}
+                        className={`
+                          p-3 text-sm rounded-lg border transition-all duration-200 text-left
+                          ${formData.domains.includes(domain)
+                            ? "bg-primary text-primary-foreground border-primary shadow-ai-glow"
+                            : "bg-input/50 border-border/50 hover:border-primary hover:bg-accent/50"
+                          }
+                        `}
+                      >
+                        {domain}
+                      </button>
+                    ))}
+                  </div>
+                  {formData.domains.length > 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      Selected: {formData.domains.join(", ")}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="position" className="text-base font-medium flex items-center gap-2">
                     <Briefcase className="h-4 w-4 text-primary" />
-                    Position Applied
+                    Technical Position Applied
                   </Label>
                   <Select value={formData.position} onValueChange={(value) => handleInputChange("position", value)}>
                     <SelectTrigger className="bg-input/50 border-border/50 focus:border-primary focus:shadow-ai-glow transition-all duration-300">
@@ -187,13 +214,99 @@ const SignupPage = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="software-engineer">Software Engineer</SelectItem>
+                      <SelectItem value="senior-software-engineer">Senior Software Engineer</SelectItem>
+                      <SelectItem value="backend-engineer">Backend Engineer</SelectItem>
+                      <SelectItem value="frontend-engineer">Frontend Engineer</SelectItem>
+                      <SelectItem value="fullstack-engineer">Full-Stack Engineer</SelectItem>
+                      <SelectItem value="mobile-developer">Mobile Developer</SelectItem>
+                      <SelectItem value="data-scientist">Data Scientist</SelectItem>
+                      <SelectItem value="data-engineer">Data Engineer</SelectItem>
+                      <SelectItem value="ml-engineer">Machine Learning Engineer</SelectItem>
+                      <SelectItem value="ai-engineer">AI Engineer</SelectItem>
+                      <SelectItem value="devops-engineer">DevOps Engineer</SelectItem>
+                      <SelectItem value="cloud-engineer">Cloud Engineer</SelectItem>
+                      <SelectItem value="security-engineer">Security Engineer</SelectItem>
+                      <SelectItem value="site-reliability-engineer">Site Reliability Engineer</SelectItem>
+                      <SelectItem value="product-manager">Product Manager</SelectItem>
+                      <SelectItem value="technical-product-manager">Technical Product Manager</SelectItem>
+                      <SelectItem value="engineering-manager">Engineering Manager</SelectItem>
+                      <SelectItem value="solutions-architect">Solutions Architect</SelectItem>
                       <SelectItem value="backend-intern">Backend Intern</SelectItem>
                       <SelectItem value="frontend-intern">Frontend Intern</SelectItem>
                       <SelectItem value="fullstack-intern">Full-Stack Intern</SelectItem>
-                      <SelectItem value="data-analyst">Data Analyst</SelectItem>
-                      <SelectItem value="ml-engineer">ML Engineer</SelectItem>
-                      <SelectItem value="devops-engineer">DevOps Engineer</SelectItem>
-                      <SelectItem value="product-manager">Product Manager</SelectItem>
+                      <SelectItem value="data-science-intern">Data Science Intern</SelectItem>
+                      <SelectItem value="ml-intern">ML Intern</SelectItem>
+                      <SelectItem value="swe-intern">Software Engineering Intern</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="company" className="text-base font-medium flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-primary" />
+                    Target Company
+                  </Label>
+                  <Select value={formData.company} onValueChange={(value) => handleInputChange("company", value)}>
+                    <SelectTrigger className="bg-input/50 border-border/50 focus:border-primary focus:shadow-ai-glow transition-all duration-300">
+                      <SelectValue placeholder="Select your target company" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {/* FAANG */}
+                      <SelectItem value="meta">Meta (Facebook)</SelectItem>
+                      <SelectItem value="apple">Apple</SelectItem>
+                      <SelectItem value="amazon">Amazon</SelectItem>
+                      <SelectItem value="netflix">Netflix</SelectItem>
+                      <SelectItem value="google">Google</SelectItem>
+                      
+                      {/* Big Tech */}
+                      <SelectItem value="microsoft">Microsoft</SelectItem>
+                      <SelectItem value="tesla">Tesla</SelectItem>
+                      <SelectItem value="uber">Uber</SelectItem>
+                      <SelectItem value="airbnb">Airbnb</SelectItem>
+                      <SelectItem value="spotify">Spotify</SelectItem>
+                      <SelectItem value="twitter">Twitter (X)</SelectItem>
+                      <SelectItem value="linkedin">LinkedIn</SelectItem>
+                      <SelectItem value="salesforce">Salesforce</SelectItem>
+                      <SelectItem value="adobe">Adobe</SelectItem>
+                      <SelectItem value="nvidia">NVIDIA</SelectItem>
+                      <SelectItem value="intel">Intel</SelectItem>
+                      <SelectItem value="oracle">Oracle</SelectItem>
+                      <SelectItem value="ibm">IBM</SelectItem>
+                      
+                      {/* Consulting & Services */}
+                      <SelectItem value="accenture">Accenture</SelectItem>
+                      <SelectItem value="deloitte">Deloitte</SelectItem>
+                      <SelectItem value="turing">Turing</SelectItem>
+                      <SelectItem value="tcs">TCS</SelectItem>
+                      <SelectItem value="infosys">Infosys</SelectItem>
+                      <SelectItem value="wipro">Wipro</SelectItem>
+                      <SelectItem value="cognizant">Cognizant</SelectItem>
+                      <SelectItem value="capgemini">Capgemini</SelectItem>
+                      
+                      {/* Unicorns & Startups */}
+                      <SelectItem value="stripe">Stripe</SelectItem>
+                      <SelectItem value="databricks">Databricks</SelectItem>
+                      <SelectItem value="snowflake">Snowflake</SelectItem>
+                      <SelectItem value="palantir">Palantir</SelectItem>
+                      <SelectItem value="atlassian">Atlassian</SelectItem>
+                      <SelectItem value="shopify">Shopify</SelectItem>
+                      <SelectItem value="zoom">Zoom</SelectItem>
+                      <SelectItem value="slack">Slack</SelectItem>
+                      <SelectItem value="discord">Discord</SelectItem>
+                      <SelectItem value="notion">Notion</SelectItem>
+                      <SelectItem value="figma">Figma</SelectItem>
+                      
+                      {/* Indian Companies */}
+                      <SelectItem value="flipkart">Flipkart</SelectItem>
+                      <SelectItem value="zomato">Zomato</SelectItem>
+                      <SelectItem value="swiggy">Swiggy</SelectItem>
+                      <SelectItem value="paytm">Paytm</SelectItem>
+                      <SelectItem value="byju">BYJU'S</SelectItem>
+                      <SelectItem value="ola">Ola</SelectItem>
+                      <SelectItem value="razorpay">Razorpay</SelectItem>
+                      <SelectItem value="freshworks">Freshworks</SelectItem>
+                      
+                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
