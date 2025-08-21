@@ -46,14 +46,56 @@ const SignupPage = () => {
 
     setLoading(true);
     
-    // Store data in localStorage for the interview page
-    localStorage.setItem("userFormData", JSON.stringify(formData));
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/interview");
-    }, 1000);
+    try {
+      // Send data to n8n webhook
+      const webhookData = {
+        event_type: "signup_completed",
+        timestamp: new Date().toISOString(),
+        user_data: formData,
+        page_source: "signup",
+        session_id: Date.now().toString()
+      };
+
+      const response = await fetch("https://manyasingh002.app.n8n.cloud/webhook-test/92213074-0731-4943-a5f0-5c4cec89e80d", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(webhookData),
+      });
+
+      console.log("n8n webhook response:", response.status);
+      
+      // Store data in localStorage for the interview page
+      localStorage.setItem("userFormData", JSON.stringify(formData));
+      
+      toast({
+        title: "Profile Created!",
+        description: "Your information has been saved successfully.",
+      });
+
+      setTimeout(() => {
+        setLoading(false);
+        navigate("/interview");
+      }, 1000);
+
+    } catch (error) {
+      console.error("Error sending to n8n webhook:", error);
+      
+      // Still proceed to interview even if webhook fails
+      localStorage.setItem("userFormData", JSON.stringify(formData));
+      
+      toast({
+        title: "Profile Created",
+        description: "Proceeding to interview (webhook error logged).",
+        variant: "destructive",
+      });
+
+      setTimeout(() => {
+        setLoading(false);
+        navigate("/interview");
+      }, 1000);
+    }
   };
 
   const handleInputChange = (field: keyof FormData, value: string) => {

@@ -105,25 +105,38 @@ const InterviewPage = () => {
   const handleSubmitInterview = async () => {
     setIsLoading(true);
 
-    // Prepare data for n8n webhook
-    const interviewData = {
-      userData,
-      completedAt: new Date().toISOString(),
-    };
-
     try {
-      // Here you would send to your n8n webhook
-      console.log("Sending interview data:", interviewData);
+      // Prepare data for n8n webhook
+      const webhookData = {
+        event_type: "interview_completed",
+        timestamp: new Date().toISOString(),
+        user_data: userData,
+        completion_data: {
+          completed_at: new Date().toISOString(),
+          session_duration: "estimated", // Could track actual time
+          page_source: "interview"
+        },
+        session_id: Date.now().toString()
+      };
+
+      console.log("Sending interview completion data to n8n:", webhookData);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch("https://manyasingh002.app.n8n.cloud/webhook-test/92213074-0731-4943-a5f0-5c4cec89e80d", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(webhookData),
+      });
+
+      console.log("n8n webhook response:", response.status);
       
       // Store completion data
       localStorage.setItem("interviewCompleted", "true");
       
       toast({
         title: "Interview Submitted!",
-        description: "Your responses have been analyzed. Redirecting to results...",
+        description: "Your data has been sent for analysis. Redirecting to results...",
       });
 
       setTimeout(() => {
@@ -131,11 +144,20 @@ const InterviewPage = () => {
       }, 1500);
 
     } catch (error) {
+      console.error("Error sending interview data to n8n:", error);
+      
+      // Still proceed to thank you page even if webhook fails
+      localStorage.setItem("interviewCompleted", "true");
+      
       toast({
-        title: "Submission Error",
-        description: "Failed to submit interview. Please try again.",
+        title: "Interview Completed",
+        description: "Proceeding to results (webhook error logged).",
         variant: "destructive",
       });
+
+      setTimeout(() => {
+        navigate("/thank-you");
+      }, 1500);
     } finally {
       setIsLoading(false);
     }
