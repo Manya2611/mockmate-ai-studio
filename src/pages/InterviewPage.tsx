@@ -168,10 +168,10 @@ const InterviewPage = () => {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen">
       <BackgroundAnimation />
       
-      <div className="relative z-10 flex flex-col h-screen">
+      <div className="relative z-10 flex flex-col min-h-screen">
         <ProgressTracker currentStep={2} />
         
         <div className="flex-1 container mx-auto px-6 py-8">
