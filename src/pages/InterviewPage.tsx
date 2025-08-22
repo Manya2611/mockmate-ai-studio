@@ -193,36 +193,36 @@ const InterviewPage = () => {
               </p>
             </div>
 
-            {/* Interview Area - Ready for ElevenLabs Integration */}
-            <div className="flex-1 bg-card/20 backdrop-blur-sm border border-border/30 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[500px]">
-              <div className="text-center space-y-6 max-w-md">
-                <div className="w-24 h-24 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                  <Bot className="w-12 h-12 text-primary" />
-                </div>
-                
-                <div>
-                  <h2 className="text-2xl font-heading font-semibold mb-3">
-                    AI Interview Assistant Ready
-                  </h2>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Your personalized interview experience is being prepared based on your profile. 
-                    The AI assistant will be integrated here soon.
-                  </p>
-                </div>
+            {/* ElevenLabs Conversational AI */}
+            <div className="flex-1 bg-card/20 backdrop-blur-sm border border-border/30 rounded-3xl p-8 flex flex-col min-h-[500px]">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-heading font-semibold mb-3">
+                  AI Interview Assistant
+                </h2>
+                <p className="text-muted-foreground">
+                  Start your personalized mock interview session below
+                </p>
+              </div>
 
-                <div className="pt-4">
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button
-                      onClick={handleSubmitInterview}
-                      disabled={isLoading}
-                      size="lg"
-                      className="bg-ai-gradient hover:shadow-ai-glow-strong px-8 py-6 rounded-full font-semibold transition-all duration-300"
-                    >
-                      <FileText className="w-5 h-5 mr-2" />
-                      {isLoading ? "Processing..." : "Complete Interview & Get Feedback"}
-                    </Button>
-                  </motion.div>
-                </div>
+              {/* ElevenLabs Conversational AI Widget */}
+              <div className="flex-1 flex items-center justify-center">
+                <div dangerouslySetInnerHTML={{ 
+                  __html: '<elevenlabs-convai agent-id="agent_9301k38hbkm7e47890frrb6p3qqd"></elevenlabs-convai>' 
+                }} />
+              </div>
+
+              <div className="pt-6 text-center">
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={handleSubmitInterview}
+                    disabled={isLoading}
+                    size="lg"
+                    className="bg-ai-gradient hover:shadow-ai-glow-strong px-8 py-6 rounded-full font-semibold transition-all duration-300"
+                  >
+                    <FileText className="w-5 h-5 mr-2" />
+                    {isLoading ? "Processing..." : "Complete Interview & Get Feedback"}
+                  </Button>
+                </motion.div>
               </div>
             </div>
           </motion.div>
