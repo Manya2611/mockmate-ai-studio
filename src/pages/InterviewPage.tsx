@@ -121,7 +121,7 @@ const InterviewPage = () => {
 
       console.log("Sending interview completion data to n8n:", webhookData);
       
-      const response = await fetch("https://manyasingh002.app.n8n.cloud/webhook-test/92213074-0731-4943-a5f0-5c4cec89e80d", {
+      const response = await fetch("https://manyasingh002.app.n8n.cloud/webhook-test/8d535c56-f0d7-48de-9c0e-fb23df5e6c07", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
