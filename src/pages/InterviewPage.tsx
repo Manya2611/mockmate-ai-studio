@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,8 @@ const InterviewPage = () => {
   const [currentMessage, setCurrentMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const storedData = localStorage.getItem("userFormData");
@@ -57,6 +59,37 @@ const InterviewPage = () => {
       navigate("/signup");
     }
   }, [navigate]);
+
+  // Initialize camera
+  useEffect(() => {
+    const initCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { width: 640, height: 480 } 
+        });
+        setVideoStream(stream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error("Error accessing camera:", error);
+        toast({
+          title: "Camera Error",
+          description: "Could not access camera. Please check permissions.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    initCamera();
+
+    // Cleanup: stop camera when component unmounts
+    return () => {
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [toast]);
 
   const addMessage = (content: string, type: "ai" | "user") => {
     const newMessage: Message = {
@@ -193,7 +226,7 @@ const InterviewPage = () => {
               </p>
             </div>
 
-            {/* ElevenLabs Conversational AI */}
+            {/* Camera and AI Interview */}
             <div className="flex-1 bg-card/20 backdrop-blur-sm border border-border/30 rounded-3xl p-8 flex flex-col min-h-[500px]">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-heading font-semibold mb-3">
@@ -202,6 +235,20 @@ const InterviewPage = () => {
                 <p className="text-muted-foreground">
                   Start your personalized mock interview session below
                 </p>
+              </div>
+
+              {/* Camera Feed */}
+              <div className="flex justify-center mb-6">
+                <div className="relative w-full max-w-md">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-auto rounded-2xl border-2 border-border/50 shadow-lg"
+                  />
+                  <div className="absolute top-3 right-3 bg-red-500 w-3 h-3 rounded-full animate-pulse" />
+                </div>
               </div>
 
               {/* ElevenLabs Conversational AI Widget */}
